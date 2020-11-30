@@ -1,9 +1,25 @@
 ---
-sudo: required
 language: python
-services:
-  - docker
+services: docker
+
+env:
+  matrix:
+    - MOLECULE_DISTRO: centos7
+    - MOLECULE_DISTRO: centos8
+
 before_install:
-  - sudo apt-get -qq update
+  # Upgrade Docker to work with docker-py.
+  - curl https://gist.githubusercontent.com/geerlingguy/ce883ad4aec6a5f1187ef93bd338511e/raw/36612d28981d92863f839c5aefe5b7dd7193d6c6/travis-ci-docker-upgrade.sh | sudo bash
+
+install:
+  # Install test dependencies.
+  - pip install -r requirements.txt
+
+before_script:
+  # Use actual Ansible Galaxy role name for the project directory.
+  - cd ../
+  - mv ansible-foreman_scap_client theforeman.foreman_scap_client
+  - cd theforeman.foreman_scap_client
+
 script:
   - molecule test
